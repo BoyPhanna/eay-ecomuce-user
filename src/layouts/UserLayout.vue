@@ -5,57 +5,72 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useCartStore } from "@/stores/user/cart";
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
+const cartStore = useCartStore();
+const islogin = ref(false);
+const searchText = ref("");
+const router = useRouter();
 
-const cartStore=useCartStore()
-const islogin=ref(false)
-const searchText=ref('')
-const router=useRouter()
-
-onMounted(()=>{
-  if(localStorage.getItem('isLoggedIn')){
-    islogin.value=true
+onMounted(() => {
+  if (localStorage.getItem("isLoggedIn")) {
+    islogin.value = true;
   }
-})
-const login=()=>{
-  islogin.value=true
-  localStorage.setItem('isLoggedIn',true)
-}
-const logout=()=>{
-  islogin.value=false
-  localStorage.removeItem('isLoggedIn')
-}
+});
+const login = () => {
+  islogin.value = true;
+  localStorage.setItem("isLoggedIn", true);
+};
+const logout = () => {
+  islogin.value = false;
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("order-data");
+  localStorage.removeItem("cart-data");
+  window.location.reload()
+};
 
-const handleSearch=(event)=>{
-  if(event.key==='Enter'){
-    router.push(
-     {
-      name:'search',
+const handleSearch = (event) => {
+  if (event.key === "Enter") {
+    router.push({
+      name: "search",
       query: {
-        q:searchText.value
-      }
-     }
-    )
+        q: searchText.value,
+      },
+    });
   }
-}
-
+};
 </script>
 
 <template>
   <div class="navbar bg-base-100 px-4 pt-4">
     <div class="flex-1">
       <RouterLink :to="{ name: 'home' }" class="btn btn-ghost text-xl"
-        >Phanna </RouterLink
-      >
+        >Phanna
+      </RouterLink>
     </div>
     <div class="flex-none">
       <div class="form-control">
-        <input v-model="searchText" @keyup="handleSearch"
-          type="text"
-          placeholder="Search"
-          class="input input-bordered w-24 md:w-auto"
-        />
+        <label class="input input-bordered flex items-center gap-2">
+          <input
+            v-model="searchText"
+            @keyup="handleSearch"
+            type="text"
+            class="grow"
+            placeholder="Search"
+          />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            class="w-4 h-4 opacity-70"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </label>
       </div>
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
@@ -74,7 +89,9 @@ const handleSearch=(event)=>{
                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
               />
             </svg>
-            <span class="badge badge-sm indicator-item">{{ cartStore.summaryQuantity }}</span>
+            <span class="badge badge-sm indicator-item">{{
+              cartStore.summaryQuantity
+            }}</span>
           </div>
         </div>
         <div
@@ -82,8 +99,12 @@ const handleSearch=(event)=>{
           class="mt-3 z-[1] card card-compact dropdown-content w-52 bg-base-100 shadow"
         >
           <div class="card-body">
-            <span class="font-bold text-lg">{{cartStore.summaryQuantity}} Items</span>
-            <span class="text-info">Subtotal: ${{ cartStore.summaryPrice }}</span>
+            <span class="font-bold text-lg"
+              >{{ cartStore.summaryQuantity }} Items</span
+            >
+            <span class="text-info"
+              >Subtotal: ${{ cartStore.summaryPrice }}</span
+            >
             <div class="card-actions">
               <RouterLink
                 :to="{ name: 'cart' }"
@@ -96,8 +117,9 @@ const handleSearch=(event)=>{
         </div>
       </div>
 
-      <button v-if="!islogin" @click="login" class="btn btn-active btn-ghost">Login</button>
-
+      <button v-if="!islogin" @click="login" class="btn btn-active btn-ghost">
+        Login
+      </button>
 
       <div v-if="islogin" class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">

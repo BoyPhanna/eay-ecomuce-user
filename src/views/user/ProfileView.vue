@@ -1,9 +1,82 @@
 <script setup>
-import UserLayout from '@/layouts/UserLayout.vue'
+import UserLayout from "@/layouts/UserLayout.vue";
+import { ref,onMounted } from "vue";
+
+const profileImageUrl=ref('https://avatars.githubusercontent.com/u/132337876?v=4')
+const name=ref('')
+const email=ref('')
+
+onMounted(()=>{
+    let profileData=localStorage.getItem('profile-data')
+    if(profileData){
+        profileData=JSON.parse(profileData)
+        profileImageUrl.value=profileData.imageUrl
+        name.value=profileData.name,
+        email.value=profileData.email
+    }
+})
+
+const handleFileUpload=(event)=>{
+    const file=event.target.files[0]
+    if(file){
+        const reader = new FileReader()
+        reader.onload = (e)=>{
+            profileImageUrl.value=e.target.result
+        }
+        reader.readAsDataURL(file)
+    }
+}
+
+const updateProfile=()=>{
+    const profileData={
+        imageUrl:profileImageUrl.value,
+        name:name.value,
+        email:email.value,
+        
+    }
+    localStorage.setItem('profile-data',JSON.stringify(profileData))
+}
 </script>
 
 <template>
-   <UserLayout>
-       <div>Profile</div>  
-    </UserLayout>
+  <UserLayout>
+    <div class="max-w-2xl m-auto border border-base-200 shadow-2xl p-4 mb-4">
+      <div class="text-2xl font-bold">Profile</div>
+      <div class="flex flex-col items-center">
+        <div class="flex flex-col items-center">
+          <div class="avatar">
+            <div class="w-24 rounded-full">
+              <img
+                :src="profileImageUrl"
+              />
+            </div>
+          </div>
+          <input type="file" @change="handleFileUpload" />
+        </div>
+
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Name</span>
+          </div>
+          <input
+          v-model="name"
+            type="text"
+            placeholder="Type here"
+            class="input input-bordered w-full"
+          />
+          <div class="label">
+            <span class="label-text">Email</span>
+          </div>
+          <input
+          v-model="email"
+            type="text"
+            placeholder="Type here"
+            class="input input-bordered w-full"
+          />
+        </label>
+
+        <button class="btn btn-neutral w-full mt-4" @click="updateProfile">Update profile</button>
+      </div>
+    </div>
+  </UserLayout>
 </template>
